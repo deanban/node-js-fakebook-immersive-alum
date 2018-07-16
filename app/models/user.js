@@ -1,34 +1,34 @@
 "use strict";
 
-const bookshelf = require('../db/bookshelf');
+const bookshelf = require("../db/bookshelf");
 
-const Comment = require('./comment');
-const Post = require('./post');
-const bcrypt = require('bcrypt');
+const Comment = require("./comment");
+const Post = require("./post");
+const bcrypt = require("bcrypt");
 
 const User = bookshelf.Model.extend({
-  tableName: 'users',
+  tableName: "users",
   initialize: function() {
-    this.on('creating', this.encryptPassword);
+    this.on("creating", this.encryptPassword);
   },
   hasTimestamps: true,
   posts: function() {
-    return this.hasMany(Posts, 'author');
+    return this.hasMany(Posts, "author");
   },
   comments: function() {
     return this.hasMany(Comments);
   },
   followers: function() {
-    return this.belongsToMany(User, 'users_users', 'user_id', 'follower_id');
+    return this.belongsToMany(User, "follows", "user_id", "follower_id");
   },
   following: function() {
-    return this.belongsToMany(User, 'users_users', 'follower_id', 'user_id');
+    return this.belongsToMany(User, "follows", "follower_id", "user_id");
   },
-  encryptPassword:(model, attrs, options) => {
+  encryptPassword: (model, attrs, options) => {
     return new Promise((resolve, reject) => {
       bcrypt.hash(model.attributes.password, 10, (err, hash) => {
         if (err) return reject(err);
-        model.set('password', hash);
+        model.set("password", hash);
         resolve(hash);
       });
     });
@@ -42,7 +42,7 @@ const User = bookshelf.Model.extend({
         return resolve(res);
       });
     });
-  },
+  }
 });
 
-module.exports = bookshelf.model('User', User);
+module.exports = bookshelf.model("User", User);
